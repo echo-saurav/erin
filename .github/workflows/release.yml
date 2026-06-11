@@ -1,4 +1,4 @@
-name: Semantic Release
+name: Release App and Container
 
 on:
   push:
@@ -15,24 +15,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
           
       - run: npm install
       
+      # 1. Compile the React static files safely ignoring ESLint
       - run: npm run build
         env:
           CI: false
 
-      # 1. Set up QEMU and Buildx so multi-arch images actually compile smoothly
+      # 2. Run semantic-release natively for Git tagging and version tracking
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Handle Docker builds directly via native GitHub Actions
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 2. Log natively into GHCR using standard GitHub Actions
       - name: Log in to GitHub Packages Registry
         uses: docker/login-action@v3
         with:
@@ -40,9 +48,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 3. Tell the plugin the daemon is already authorized, bypassing its Docker Hub check
-          PLUGIN_DOCKER_LOGIN: "false"
-          DOCKER_IMAGE: ghcr.io/${{ github.repository }}
+      # 4. Build and push multi-arch containers effortlessly
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
