@@ -45,9 +45,9 @@ const VideoCard = ({ index, video, isLoaded, refForwarder, onDoubleClick }) => {
   }
 
   return (
-    <div className={`video ${orientationClass}`} >
+    <div className='video'}>
       <video
-        className="player"
+        className= {`player ${orientationClass}`}
         data-index={index}
         src={safeUrl}
         ref={forward}
