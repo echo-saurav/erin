@@ -14,7 +14,8 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,19 +23,21 @@ jobs:
           node-version: 20
           cache: 'npm'
           
-      - run: npm install
+      - name: Install dependencies
+        run: npm install
       
-      # 1. Compile the React static files safely ignoring ESLint
-      - run: npm run build
+      - name: Compile frontend asset
+        run: npm run build
         env:
           CI: false
 
-      # 2. Run semantic-release natively for Git tagging and version tracking
-      - run: npx semantic-release
+      # Runs core semantic-release plugins, skipping the broken docker plugin completely
+      - name: Run Semantic Release
+        run: |
+          npx semantic-release --plugins @semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3. Handle Docker builds directly via native GitHub Actions
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         
@@ -48,7 +51,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4. Build and push multi-arch containers effortlessly
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
