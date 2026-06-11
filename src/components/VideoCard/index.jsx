@@ -53,6 +53,7 @@ const VideoCard = ({ index, video, isLoaded, refForwarder, onDoubleClick }) => {
         ref={forward}
         onDoubleClick={handleDoubleClick}
         playsInline={true}
+        onLoadedMetadata={handleLoadedMetadata}
         muted={true}
         preload="auto"
       />
