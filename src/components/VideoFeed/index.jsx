@@ -111,7 +111,33 @@ const VideoFeed = ({
         if (entry.isIntersecting) {
           visibleIndex = currentIndex;
           videoElement.play().catch((_) => {});
+              // start
+          // --- ADDED FOR AUTO-ROTATE ROTATION LOGIC ---
+          const checkAndApplyRotation = () => {
+            // 1. Is the video itself landscape?
+            const isVideoLandscape = videoElement.videoWidth > videoElement.videoHeight;
+            
+            // 2. Is the mobile device currently held vertically (portrait screen)?
+            const isMobilePortrait = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches;
+    
+            if (isVideoLandscape && isMobilePortrait) {
+              videoElement.classList.add("auto-rotate-landscape");
+            } else {
+              videoElement.classList.remove("auto-rotate-landscape");
+            }
+          };
+    
+          // Run immediately if metadata is already loaded, otherwise wait for it
+          if (videoElement.readyState >= 1) {
+            checkAndApplyRotation();
+          } else {
+            videoElement.addEventListener("loadedmetadata", checkAndApplyRotation, { once: true });
+          }
+    
+          // Also listen for device orientation changes while this specific video is playing
+          window.screen?.orientation?.addEventListener?.("change", checkAndApplyRotation);
 
+          // end 
           if ( window.VIDEO_START_POSITION !== 'start' ) {
             if ( videoElement.readyState >= 1 ) startVideoAtSpecificPoint({ target: videoElement });
             else videoElement.addEventListener('loadedmetadata', startVideoAtSpecificPoint, true);
@@ -126,8 +152,10 @@ const VideoFeed = ({
         // Case when a video is off-screen or being scrolled in / out of the screen
         else {
           videoElement.pause();
+          videoElement.classList.remove("auto-rotate-landscape");
           videoElement.removeEventListener("timeupdate", handleVideoTimeUpdate, true);
           videoElement.removeEventListener("ended", replayVideo, true);
+          videoElement.classList.remove("auto-rotate-landscape");
 
           if ( window.VIDEO_START_POSITION !== 'start' ) {
             videoElement.removeEventListener('loadedmetadata', startVideoAtSpecificPoint, true);
