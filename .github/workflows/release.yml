@@ -21,10 +21,16 @@ jobs:
           cache: 'npm'
           
       - run: npm install
-      # Added CI=false here to ignore the ESLint warning and let the build pass
+      
       - run: npm run build
         env:
           CI: false
+
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_REGISTRY: ghcr.io
+          DOCKER_REGISTRY_USER: ${{ github.actor }}
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          # This forces semantic-release to ignore "mosswill/erin" and push to your space
+          DOCKER_IMAGE: ghcr.io/${{ github.repository }}
