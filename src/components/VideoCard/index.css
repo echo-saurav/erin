@@ -9,6 +9,22 @@
   height: 100%;
 }
 
+/* The magic rotation class applied by JavaScript */
+video.player.auto-rotate-landscape {
+  transform: rotate(90deg);
+  
+  /* Swap dimensions so it locks into the screen constraints natively */
+  width: 100vh !important;
+  height: 100vw !important;
+  
+  /* Force video stream to scale up and fill the entire viewport seamlessly */
+  object-fit: cover;
+  
+  /* Ensure transitions don't throw off scroll-snapping layout boundaries */
+  position: absolute;
+}
+
+
 html[data-scroll-direction="horizontal"] .video {
   flex-grow: 1;
   flex-shrink: 0;
