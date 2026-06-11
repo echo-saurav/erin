@@ -110,25 +110,38 @@ const VideoFeed = ({
         // Case when a video is scroll-snapped and occupies the screen
         if (entry.isIntersecting) {
           visibleIndex = currentIndex;
-          // videoElement.play().catch((_) => {});
-          videoElement.play()
-            .then(() => {
-              // 2. This block ONLY runs once the video has successfully started playing!
-              // We safely grab dimensions without guessing metadata states
-              const width = videoElement.videoWidth;
-              const height = videoElement.videoHeight;
-              
-              const isLandscape = width > height;
-              const isMobilePortrait = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches;
-
-              if (isLandscape && isMobilePortrait) {
-                // Apply the visual class to handle the shift smoothly
-                videoElement.classList.add("auto-rotate-landscape");
-              }
-            })
-            .catch((error) => {
-              console.log("Playback blocked or interrupted:", error);
-            });
+          videoElement.play().catch((_) => {});
+          // videoElement.play()
+          // .then(() => {
+          //   const isLandscape = videoElement.videoWidth > videoElement.videoHeight;
+          //   const isMobilePortrait = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches;
+          //
+          //   // Target the immediate parent container instead of the video track
+          //   const container = videoElement.parentElement; 
+          //
+          //   if (isLandscape && isMobilePortrait && container) {
+          //     container.classList.add("gpu-accelerated-rotation");
+          //   }
+          // })
+          // .catch((err) => console.log(err));
+          // videoElement.play()
+          //   .then(() => {
+          //     // 2. This block ONLY runs once the video has successfully started playing!
+          //     // We safely grab dimensions without guessing metadata states
+          //     const width = videoElement.videoWidth;
+          //     const height = videoElement.videoHeight;
+          //
+          //     const isLandscape = width > height;
+          //     const isMobilePortrait = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches;
+          //
+          //     if (isLandscape && isMobilePortrait) {
+          //       // Apply the visual class to handle the shift smoothly
+          //       videoElement.classList.add("auto-rotate-landscape");
+          //     }
+          //   })
+          //   .catch((error) => {
+          //     console.log("Playback blocked or interrupted:", error);
+          //   });
 
           if ( window.VIDEO_START_POSITION !== 'start' ) {
             if ( videoElement.readyState >= 1 ) startVideoAtSpecificPoint({ target: videoElement });
@@ -144,7 +157,6 @@ const VideoFeed = ({
         // Case when a video is off-screen or being scrolled in / out of the screen
         else {
           videoElement.pause();
-          videoElement.classList.remove("auto-rotate-landscape");
           videoElement.removeEventListener("timeupdate", handleVideoTimeUpdate, true);
           videoElement.removeEventListener("ended", replayVideo, true);
 

@@ -6,6 +6,7 @@ import "./index.css";
 
 const VideoCard = ({ index, video, isLoaded, refForwarder, onDoubleClick }) => {
   const videoRef = useRef(null);
+  const [orientationClass, setOrientationClass] = useState("");
 
   // Handle click
   // - Seek forward / backward on double click
@@ -17,6 +18,20 @@ const VideoCard = ({ index, video, isLoaded, refForwarder, onDoubleClick }) => {
     videoRef.current = _ref;
     refForwarder(_ref);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Detect orientation when video metadata loads
+  const handleLoadedMetadata = (e) => {
+    const videoEl = e.currentTarget;
+    
+    // Check if the video asset is landscape
+    if (videoEl.videoWidth > videoEl.videoHeight) {
+      setOrientationClass("auto-rotate-landscape");
+    } else if (videoEl.videoWidth < videoEl.videoHeight) {
+      setOrientationClass("video-portrait");
+    } else {
+      setOrientationClass("video-square");
+    }
+  };
 
   // Safely encode only the filename part of the URL
   let safeUrl = null;
@@ -30,7 +45,7 @@ const VideoCard = ({ index, video, isLoaded, refForwarder, onDoubleClick }) => {
   }
 
   return (
-    <div className="video">
+    <div className={`video ${orientationClass}`} >
       <video
         className="player"
         data-index={index}
