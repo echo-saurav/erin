@@ -43,7 +43,7 @@
 
 		# CORS - General & Preflight
 		header {
-			Access-Control-Allow-Origin "{header.origin}"
+			Access-Control-Allow-Origin *
 			Access-Control-Expose-Headers "Authorization"
 			Access-Control-Allow-Credentials "true"
 			Access-Control-Allow-Request-Headers "Authorization"
